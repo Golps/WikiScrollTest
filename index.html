@@ -381,13 +381,16 @@ body.how .toggle-sw.on{background:var(--h1);}
 
 /* ── MODAL ── */
 .modal-overlay{
-  position:fixed;inset:0;z-index:900;display:none;
-  align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:900;
+  display:flex;align-items:center;justify-content:center;
   background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  opacity:0;transition:opacity .25s ease;
+  visibility:hidden;opacity:0;pointer-events:none;
+  transition:opacity .28s ease, visibility 0s .28s;
 }
-.modal-overlay.open{display:flex;pointer-events:auto;}
-.modal-overlay.visible{opacity:1;}
+.modal-overlay.open{
+  visibility:visible;opacity:1;pointer-events:auto;
+  transition:opacity .28s ease, visibility 0s 0s;
+}
 .modal{
   width:min(420px,88vw);background:rgba(12,12,20,.98);
   border:1px solid var(--border);border-radius:24px;padding:32px;
@@ -820,6 +823,46 @@ body.how .sp-about-logo{
 }
 .swipe-flash.show{opacity:1;}
 
+/* ── SWIPE TRAIL ── */
+.swipe-trail{
+  position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;
+  transition:opacity .15s ease-out;
+}
+.swipe-trail.like{background:linear-gradient(90deg,transparent 30%,rgba(74,222,128,.06) 100%);}
+.swipe-trail.skip{background:linear-gradient(-90deg,transparent 30%,rgba(248,113,113,.05) 100%);}
+.swipe-trail.vis{opacity:1;}
+
+/* ── FLY-OFF CLONE ── */
+.fly-clone{
+  position:fixed;top:0;left:0;width:100vw;z-index:50;
+  pointer-events:none;will-change:transform,opacity;
+  transform-origin:center center;
+}
+
+/* ── SHIMMER PLACEHOLDER ── */
+.shimmer-card{
+  height:var(--vh);scroll-snap-align:start;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:#07070d;overflow:hidden;
+}
+.shimmer-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,rgba(255,255,255,.01) 25%,rgba(255,255,255,.04) 37%,rgba(255,255,255,.01) 63%);
+  background-size:200% 100%;
+  animation:shimMove 1.5s ease-in-out infinite;
+}
+.shimmer-card .shim-blobs{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  padding:18%;
+}
+.shim-blob{border-radius:12px;background:rgba(255,255,255,.04);}
+.shim-blob.title{width:65%;height:22px;}
+.shim-blob.sub{width:45%;height:14px;}
+.shim-blob.body1{width:90%;height:10px;border-radius:6px;}
+.shim-blob.body2{width:78%;height:10px;border-radius:6px;}
+.shim-blob.body3{width:84%;height:10px;border-radius:6px;}
+@keyframes shimMove{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
 
 /* ── LIGHT THEME ── */
 body.light{background:#f4f3ef;color:#1a1a2e;}
@@ -899,6 +942,9 @@ body.light #privacyOverlay .modal div{color:rgba(0,0,0,.6) !important;}
 body.light #privacyOverlay strong{color:rgba(0,0,0,.8) !important;}
 body.light .depth-val{color:#d97706;}
 body.light #privacyLinkSettings,body.light #burgerPrivacyLink{color:rgba(0,0,0,.25) !important;}
+body.light .shimmer-card{background:#f4f3ef;}
+body.light .shimmer-card::before{background:linear-gradient(110deg,rgba(0,0,0,.01) 25%,rgba(0,0,0,.04) 37%,rgba(0,0,0,.01) 63%);background-size:200% 100%;}
+body.light .shim-blob{background:rgba(0,0,0,.05);}
 
 /* ── HISTORY PANEL ── */
 .hp{
@@ -1343,7 +1389,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
           Swipe right to like · Left to skip · Long-press for Ambient Mode.
         </div>
         <div class="sp-about-contact">contact [at] wikiscroll.com</div>
-        <div style="margin-top:12px;text-align:center;"><a href="javascript:void(0)" id="burgerPrivacyLink" style="font-size:12px;color:rgba(255,255,255,.35);text-decoration:underline;text-underline-offset:3px;padding:8px 16px;display:inline-block;">Privacy Policy</a></div>
+        <div style="margin-top:12px;text-align:center;"><button id="burgerPrivacyLink" style="font-size:12px;color:rgba(255,255,255,.35);text-decoration:underline;text-underline-offset:3px;padding:8px 16px;display:inline-block;background:none;border:none;cursor:pointer;font-family:inherit;">Privacy Policy</button></div>
       </div>
     </div>
   </div>
@@ -1556,7 +1602,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
         Swipe right to like · Left to skip · Long-press for Ambient Mode.
       </div>
       <div class="sp-about-contact">contact [at] wikiscroll.com</div>
-      <div style="margin-top:12px;text-align:center;"><a href="javascript:void(0)" id="privacyLinkSettings" style="font-size:12px;color:rgba(255,255,255,.35);text-decoration:underline;text-underline-offset:3px;padding:8px 16px;display:inline-block;">Privacy Policy</a></div>
+      <div style="margin-top:12px;text-align:center;"><button id="privacyLinkSettings" style="font-size:12px;color:rgba(255,255,255,.35);text-decoration:underline;text-underline-offset:3px;padding:8px 16px;display:inline-block;background:none;border:none;cursor:pointer;font-family:inherit;">Privacy Policy</button></div>
     </div>
   </div>
 </div>
@@ -2838,45 +2884,30 @@ document.getElementById('likesBtn').addEventListener('click', () => {
 });
 document.getElementById('lpClose').addEventListener('click', closeAllPanels);
 
-// Privacy policy modal — bulletproof mobile opening
-// The modal uses a two-phase open: display:flex first, then opacity:1 in the next
-// frame. This prevents mobile click-through where the overlay backdrop receives
-// the same tap event that triggered the open, immediately closing it.
+// Privacy policy modal
+// Uses visibility:hidden/visible CSS approach — NO display:none transitions.
+// The overlay is always display:flex but invisible when closed.
+// Just toggling 'open' class triggers visibility + opacity transition.
 function openPrivacy() {
-  const ov = document.getElementById('privacyOverlay');
-  // Phase 1: make visible but transparent and non-interactive
-  ov.classList.add('open');
-  ov.style.pointerEvents = 'none';
-  // Phase 2: fade in after current event loop completes
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      ov.classList.add('visible');
-      ov.style.pointerEvents = '';
-    });
-  });
+  document.getElementById('privacyOverlay').classList.add('open');
 }
 function closePrivacy() {
-  const ov = document.getElementById('privacyOverlay');
-  ov.classList.remove('visible');
-  ov.style.pointerEvents = 'none';
-  setTimeout(() => { ov.classList.remove('open'); ov.style.pointerEvents = ''; }, 260);
+  document.getElementById('privacyOverlay').classList.remove('open');
 }
 document.getElementById('privacyClose').addEventListener('click', closePrivacy);
 document.getElementById('privacyOverlay').addEventListener('click', function(ev) {
-  if (ev.target !== this) return;
-  closePrivacy();
+  if (ev.target === this) closePrivacy();
 });
-document.getElementById('privacyLinkSettings').addEventListener('click', ev => {
-  ev.preventDefault();
+document.getElementById('privacyLinkSettings').addEventListener('click', () => {
   closeSettings();
-  openPrivacy();
+  // Delay opening until settings panel slide-out is underway
+  setTimeout(openPrivacy, 100);
 });
-document.getElementById('burgerPrivacyLink').addEventListener('click', ev => {
-  ev.preventDefault();
+document.getElementById('burgerPrivacyLink').addEventListener('click', (ev) => {
   ev.stopPropagation();
   closeBurger();
-  // Wait for burger close animation to fully complete before opening modal
-  setTimeout(openPrivacy, 380);
+  // Delay opening until burger collapse animation is underway
+  setTimeout(openPrivacy, 350);
 });
 document.addEventListener('keydown', ev => {
   if (ev.key!=='Escape') return;
@@ -2910,43 +2941,61 @@ document.getElementById('ambientOverlay').addEventListener('click', ev => {
 });
 document.getElementById('ambientClose').addEventListener('click', closeAmbient);
 
+// ── SHIMMER PLACEHOLDERS ──────────────────────────────────────────────────
+// Show loading shimmers at the end of the feed so the user never hits a hard stop
+function ensureShimmers() {
+  const feed = document.getElementById('feed');
+  // Remove existing shimmers
+  feed.querySelectorAll('.shimmer-card').forEach(s => s.remove());
+  // Add 2 shimmers after the last real card
+  for (let i = 0; i < 2; i++) {
+    const s = document.createElement('div');
+    s.className = 'shimmer-card';
+    s.innerHTML = '<div class="shim-blobs"><div class="shim-blob title"></div><div class="shim-blob sub"></div><div class="shim-blob body1"></div><div class="shim-blob body2"></div><div class="shim-blob body3"></div></div>';
+    feed.appendChild(s);
+  }
+}
+
+// Patch flushQueue to maintain shimmers
+const _origFlushQueue = flushQueue;
+flushQueue = function(n) {
+  _origFlushQueue(n);
+  ensureShimmers();
+};
+
 // ── SWIPE GESTURES + LONG PRESS ────────────────────────────────────────────
-// Tinder-faithful swipe implementation:
 //
-// DRAG PHASE:
-//   - Card follows finger 1:1 with natural rotation
-//   - Rotation pivots from the vertical touch point (top = more tilt)
-//   - Like/Skip indicators reveal proportionally
+// ARCHITECTURE: Clone-based fly-off
 //
-// RELEASE → FLY-OFF:
-//   1. Snapshot card position → switch to position:fixed (floats above feed)
-//   2. Scroll feed to next card INSTANTLY (visible underneath, no black gap)
-//   3. Animate card flying off at velocity-proportional speed
-//   4. Remove card from DOM after animation
+// Instead of detaching the real card from scroll flow (which disrupts layout
+// and causes black gaps), we:
+//   1. Create a visual CLONE of the card
+//   2. Position the clone as position:fixed at the card's screen position
+//   3. Hide the original card (keeps its space, no layout shift)
+//   4. Scroll the feed to the next card underneath the clone
+//   5. Animate the clone off-screen
+//   6. Remove clone and original card after animation
 //
-// RELEASE → SPRING-BACK:
-//   - Elastic overshoot settle when threshold not met
+// This eliminates ALL black gaps, snap-back, and layout jitter because the
+// scroll flow is never disrupted — only a cosmetic clone moves.
 //
-// VELOCITY TRACKING:
-//   - Samples last 4 touch positions for accurate flick detection
-//   - Fast flick (>0.4 px/ms) triggers with just 25px displacement
-//   - Slow drag triggers at >75px displacement
-//   - Animation duration inversely proportional to release velocity
+// PLATFORM TUNING:
+//   Mobile: velocity-proportional speed (280-400ms), responds to flick force
+//   Desktop: consistent deliberate speed (420ms), satisfying keyboard feel
+//
 (function() {
   const feed = document.getElementById('feed');
-  let startX = 0, startY = 0, startTime = 0, curDx = 0;
+  const IS_TOUCH = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  let startX = 0, startY = 0, curDx = 0;
   let activeCard = null, swiping = false, lpTimer = null;
   let flyLock = false;
 
-  // Velocity tracking — ring buffer of last 4 samples
-  const VEL_SAMPLES = 4;
+  // Velocity tracking — ring buffer of last 5 samples
   let velHistory = [];
-
   function addVelSample(x, t) {
     velHistory.push({ x, t });
-    if (velHistory.length > VEL_SAMPLES) velHistory.shift();
+    if (velHistory.length > 5) velHistory.shift();
   }
-
   function getVelocity() {
     if (velHistory.length < 2) return 0;
     const first = velHistory[0], last = velHistory[velHistory.length - 1];
@@ -2966,39 +3015,63 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
 
   function ind(card, cls) { return card?.querySelector('.' + cls); }
 
-  // ── DRAG: finger-following with Tinder-style rotation ──
-  // Rotation magnitude depends on how high the touch is on the card.
-  // Touch near top → more rotation (like Tinder's pivot-from-bottom feel).
+  // ── SWIPE TRAIL: directional color wash during drag ──
+  function updateTrail(card, dx) {
+    let trail = card.querySelector('.swipe-trail');
+    if (!trail) {
+      trail = document.createElement('div');
+      trail.className = 'swipe-trail';
+      card.appendChild(trail);
+    }
+    const absDx = Math.abs(dx);
+    if (absDx < 15) {
+      trail.classList.remove('vis', 'like', 'skip');
+      return;
+    }
+    trail.classList.remove('like', 'skip');
+    trail.classList.add(dx > 0 ? 'like' : 'skip', 'vis');
+    trail.style.opacity = Math.min(absDx / 120, 1);
+  }
+
+  function clearTrail(card) {
+    const trail = card?.querySelector('.swipe-trail');
+    if (trail) { trail.classList.remove('vis'); trail.style.opacity = ''; }
+  }
+
+  // ── DRAG: finger-following with natural rotation ──
   let touchYRatio = 0.5;
 
   function applyDrag(card, dx) {
-    // Rotation: max ±15°, scaled by distance and touch height
-    // Higher touch = more rotation (feels like pivoting from bottom)
-    const rotScale = 0.04 + touchYRatio * 0.04; // 0.04–0.08
+    // Rotation pivots from touch height — top = more tilt (Tinder feel)
+    const rotScale = 0.04 + touchYRatio * 0.04;
     const maxRot = 15;
     const rot = Math.max(-maxRot, Math.min(maxRot, dx * rotScale));
 
     card.style.transition = 'none';
     card.style.transform = `translateX(${dx}px) rotate(${rot}deg) translateZ(0)`;
 
-    // Indicator reveal: smooth ease-in curve
+    // Quadratic ease-in for indicators (invisible for small drags, ramps up)
     const rawP = Math.abs(dx) / 75;
-    const progress = Math.min(rawP * rawP, 1); // Quadratic ease-in
+    const progress = Math.min(rawP * rawP, 1);
     const li = ind(card, 'like-ind'), si = ind(card, 'skip-ind');
     if (dx > 0) { if (li) li.style.opacity = progress; if (si) si.style.opacity = 0; }
     else        { if (si) si.style.opacity = progress; if (li) li.style.opacity = 0; }
+
+    // Swipe trail
+    updateTrail(card, dx);
   }
 
-  // ── SPRING BACK: elastic overshoot when threshold not met ──
+  // ── SPRING BACK: elastic overshoot ──
   function springBack(card) {
     card.style.transition = 'transform .4s cubic-bezier(.175,.885,.32,1.275)';
     card.style.transform = 'translateZ(0)';
     const li = ind(card, 'like-ind'), si = ind(card, 'skip-ind');
     if (li) { li.style.transition = 'opacity .25s ease'; li.style.opacity = 0; }
     if (si) { si.style.transition = 'opacity .25s ease'; si.style.opacity = 0; }
+    clearTrail(card);
   }
 
-  // ── FLY OFF: detach → scroll → animate → remove ──
+  // ── FLY OFF: clone-based, zero black gap ──
   function flyOff(card, dir, releaseVelocity) {
     if (flyLock) return;
     flyLock = true;
@@ -3021,26 +3094,33 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
     const cardIdx = allCards.indexOf(card);
     const nextCard = cardIdx >= 0 ? allCards[cardIdx + 1] : null;
 
-    // 4. Snapshot card position and detach from scroll flow
+    // 4. Create a visual clone at the card's screen position
     const rect = card.getBoundingClientRect();
-    const currentX = parseFloat(card.style.transform?.match(/translateX\(([^)]+)px\)/)?.[1] || 0);
+    const clone = card.cloneNode(true);
+    clone.className = 'fly-clone';
+    clone.style.top = rect.top + 'px';
+    clone.style.height = rect.height + 'px';
 
-    card.style.position = 'fixed';
-    card.style.top = rect.top + 'px';
-    card.style.left = '0';
-    card.style.width = '100vw';
-    card.style.height = rect.height + 'px';
-    card.style.zIndex = '50';
-    card.style.scrollSnapAlign = 'none';
-    card.style.margin = '0';
+    // Preserve the card's current drag transform on the clone
+    const currentTransform = card.style.transform || 'translateZ(0)';
+    clone.style.transform = currentTransform;
+    clone.style.transition = 'none';
+    document.body.appendChild(clone);
+
+    // 5. Hide the original card (keeps space in DOM — no layout shift)
     card.style.transition = 'none';
-    card.style.transform = `translateX(${currentX}px) rotate(${(currentX || 0) * 0.05}deg) translateZ(0)`;
+    card.style.transform = '';
+    card.style.opacity = '0';
+    card.style.visibility = 'hidden';
+    card.style.scrollSnapAlign = 'none';
+    card.style.pointerEvents = 'none';
 
-    // 5. Scroll feed to next card IMMEDIATELY (underneath the floating card)
+    // 6. Scroll feed to next card UNDERNEATH the clone
     if (nextCard) {
       feed.style.scrollSnapType = 'none';
       feed.style.webkitScrollSnapType = 'none';
       feed.scrollTop = nextCard.offsetTop;
+      // Triple rAF to ensure scroll settles before re-enabling snap
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
@@ -3051,7 +3131,22 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
       });
     }
 
-    // 6. Flash glow on next card
+    // 7. Calculate animation timing
+    // Mobile: 280-400ms based on velocity. Desktop: 420ms fixed.
+    const absVel = Math.abs(releaseVelocity || 0);
+    let duration;
+    if (IS_TOUCH) {
+      duration = Math.max(280, Math.min(400, 420 - absVel * 180));
+    } else {
+      duration = 420; // Consistent, deliberate desktop feel
+    }
+    const durationS = (duration / 1000).toFixed(3);
+
+    // Fly distance and rotation
+    const flyX = dir > 0 ? 120 : -120;
+    const flyRot = dir > 0 ? 20 : -20;
+
+    // 8. Glow flash on the next card
     if (nextCard) {
       let flash = nextCard.querySelector('.swipe-flash');
       if (!flash) {
@@ -3065,32 +3160,23 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
       setTimeout(() => flash.classList.remove('show'), 500);
     }
 
-    // 7. Animate fly-off with velocity-proportional duration
-    // Fast flick → ~200ms, slow drag → ~380ms
-    const absVel = Math.abs(releaseVelocity || 0);
-    const duration = Math.max(200, Math.min(380, 400 - absVel * 200));
-    const durationS = (duration / 1000).toFixed(2);
-
-    // Fly distance: always off-screen (120vw) with natural rotation
-    const flyX = dir > 0 ? 120 : -120;
-    const flyRot = dir > 0 ? 18 : -18;
-
+    // 9. Animate the clone off-screen
     requestAnimationFrame(() => {
-      card.style.transition = `transform ${durationS}s cubic-bezier(.22,.68,.35,1), opacity ${durationS}s ease-out`;
-      card.style.transform = `translateX(${flyX}vw) rotate(${flyRot}deg) translateZ(0)`;
-      card.style.opacity = '0';
-
-      // 8. Remove card from DOM after animation completes
-      const cleanup = () => {
-        card.remove();
-        flyLock = false;
-      };
-      // Use transitionend with safety timeout
-      let cleaned = false;
-      const safeCleanup = () => { if (!cleaned) { cleaned = true; cleanup(); } };
-      card.addEventListener('transitionend', safeCleanup, { once: true });
-      setTimeout(safeCleanup, duration + 50);
+      // Ease curve: fast start, gentle float to exit (like a tossed card)
+      clone.style.transition = `transform ${durationS}s cubic-bezier(.22,.65,.35,1), opacity ${durationS}s ease-in`;
+      clone.style.transform = `translateX(${flyX}vw) rotate(${flyRot}deg) translateZ(0)`;
+      clone.style.opacity = '0';
     });
+
+    // 10. Cleanup after animation
+    const cleanupTime = duration + 60;
+    setTimeout(() => {
+      clone.remove();
+      card.remove();
+      flyLock = false;
+      // Trigger more cards if needed
+      attachSentinel();
+    }, cleanupTime);
   }
 
   // ── TOUCH: start ──
@@ -3101,13 +3187,12 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
 
     startX = ev.touches[0].clientX;
     startY = ev.touches[0].clientY;
-    startTime = Date.now();
     curDx = 0;
     swiping = false;
     activeCard = card;
-    velHistory = [{ x: startX, t: startTime }];
+    velHistory = [{ x: startX, t: Date.now() }];
 
-    // Track touch Y position relative to card for rotation pivot
+    // Touch Y for rotation pivot
     const cardRect = card.getBoundingClientRect();
     touchYRatio = Math.max(0, Math.min(1, (ev.touches[0].clientY - cardRect.top) / cardRect.height));
 
@@ -3125,27 +3210,24 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
     const dy = ev.touches[0].clientY - startY;
 
     if (!swiping) {
-      // Vertical scroll wins if it's clearly vertical
       if (Math.abs(dy) > Math.abs(dx) + 8) {
         clearTimeout(lpTimer);
         activeCard = null;
         return;
       }
-      // Horizontal threshold to start swiping
       if (Math.abs(dx) > 10) {
         swiping = true;
         clearTimeout(lpTimer);
       } else return;
     }
 
-    // Guard: if card scrolled out of view during drag, snap back
+    // Guard: if card scrolled away during drag
     if (activeCard !== curCard()) {
       springBack(activeCard);
       activeCard = null;
       return;
     }
 
-    // Track velocity
     addVelSample(ev.touches[0].clientX, Date.now());
     curDx = dx;
     if (swipeEnabled && ev.cancelable) {
@@ -3168,15 +3250,15 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
 
     if (!swipeEnabled) { springBack(card); return; }
 
-    // Calculate release velocity from sample history
-    const velocity = getVelocity(); // px/ms, signed
+    // Velocity from sample buffer (captures release speed, not average)
+    const velocity = getVelocity();
     const absVel = Math.abs(velocity);
     const absDx = Math.abs(curDx);
 
-    // Tinder-style trigger logic:
-    // - Fast flick (>0.4 px/ms) with minimal displacement (>25px)
-    // - Medium flick (>0.25 px/ms) with moderate displacement (>50px)
-    // - Slow drag with large displacement (>75px)
+    // Three-tier trigger (Tinder-style):
+    //   Fast flick → tiny displacement OK
+    //   Medium flick → moderate displacement
+    //   Slow drag → large displacement
     const triggered =
       (absVel > 0.4 && absDx > 25) ||
       (absVel > 0.25 && absDx > 50) ||
@@ -3213,9 +3295,9 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
     const card = curCard(); if (!card) return;
     const id = card.dataset.id;
     switch (ev.key) {
-      // Desktop fly-off uses a consistent "medium flick" velocity
-      case 'ArrowLeft':  ev.preventDefault(); flyOff(card, -1, 0.8); break;
-      case 'ArrowRight': ev.preventDefault(); flyOff(card,  1, 0.8); break;
+      // Desktop: no releaseVelocity → uses the fixed 420ms desktop timing
+      case 'ArrowLeft':  ev.preventDefault(); flyOff(card, -1, 0); break;
+      case 'ArrowRight': ev.preventDefault(); flyOff(card,  1, 0); break;
       case 'l': case 'L': toggleLike(id); break;
       case 's': case 'S': { const a = articles.find(x => x.id === id); if (a) doShare(a); break; }
       case 'r': case 'R': { const a = articles.find(x => x.id === id); if (a) window.open(a.url, '_blank'); break; }
