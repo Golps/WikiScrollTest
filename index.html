@@ -1171,6 +1171,23 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
   .depth-step span{font-size:10px;}
   .kb-bar{bottom:16px;}
   .depth-wrap{max-width:340px;}
+  .modal{width:min(500px,85vw);padding:36px;}
+}
+/* Larger tablets (768px+) — show header controls instead of burger */
+@media(min-width:768px) and (max-width:1024px){
+  .hdr-right > .lang-wrap,
+  .hdr-right > #likesBtn,
+  .hdr-right > #topicsBtn,
+  .hdr-right > #settingsBtn{display:inline-flex !important;}
+  .burger-btn{display:none !important;}
+  .panel{max-width:580px;padding:30px 36px;}
+  .art-title{font-size:25px;}
+  .art-body{font-size:15px;-webkit-line-clamp:11;}
+  .art-img{max-height:250px;}
+  .act{padding:14px 20px;font-size:14.5px;min-height:48px;}
+  .lp,.sp,.hp{width:400px;}
+  .otd-badge{font-size:12px;padding:6px 16px;}
+  .otd-star{font-size:32px;}
 }
 /* iPad landscape & small laptops */
 @media(min-width:1025px) and (max-width:1366px){
@@ -1187,6 +1204,14 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
   .acts{flex-wrap:wrap;justify-content:center;}
   .act{padding:14px 20px;font-size:14.5px;}
   .map-container{inset:50px 32px 32px;}
+}
+/* Large iPad Pro landscape */
+@media(min-width:1025px) and (max-width:1366px) and (orientation:landscape){
+  .panel{max-width:620px;padding:32px 40px;}
+  .art-title{font-size:26px;}
+  .art-body{-webkit-line-clamp:13;font-size:15px;}
+  .art-img{max-height:280px;border-radius:16px;}
+  .modal{width:min(540px,70vw);}
 }
 /* Mobile */
 @media(max-width:600px){
@@ -1296,13 +1321,6 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
           <div class="depth-step" data-d="5"><div class="ds-dot"></div><span>Obscure</span></div>
         </div>
       </div>
-    </div>
-    <div class="burger-row">
-      <div class="burger-row-label">
-        <span class="ico">📳</span>
-        <div><div>Haptic Feedback <span class="beta-tag">Beta</span></div><div class="burger-row-sub">Light vibration on swipe (Android)</div></div>
-      </div>
-      <button class="toggle-sw" id="hapticToggle" role="switch" aria-label="Toggle haptic feedback"></button>
     </div>
     <div class="burger-row">
       <div class="burger-row-label"><span class="ico">❤️</span><span>Saved Articles</span></div>
@@ -1509,13 +1527,6 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
         </div>
       </div>
     </div>
-    <div class="sp-row">
-      <div class="sp-row-label">
-        <span class="ico">📳</span>
-        <div><div>Haptic Feedback <span class="beta-tag">Beta</span></div><div class="sp-row-sub">Light vibration on swipe (Android)</div></div>
-      </div>
-      <button class="toggle-sw" id="dkHapticToggle" role="switch"></button>
-    </div>
   </div>
 
   <div class="sp-section">
@@ -1690,7 +1701,7 @@ const NONPLACE_RE   = /\b(phrasebook|itinerary|travel topic|travel guide|travel 
 let curMode = 'wiki', curLang = 'en';
 let curTopics = new Set();
 let swipeEnabled = true, rabbitHoleEnabled = false, kbBarEnabled = true;
-let lightMode = false, depthLevel = 3, hapticEnabled = false;
+let lightMode = false, depthLevel = 3;
 let history = [];
 let collections = []; // [{name:'Favorites', ids:['w123','w456']}, ...]
 let activeCollection = null; // null = show all
@@ -1722,7 +1733,6 @@ function loadPersistedState() {
   kbBarEnabled = settings.kbBar !== false;
   lightMode = settings.lightMode === true;
   depthLevel = settings.depth || 3;
-  hapticEnabled = settings.haptic === true;
   history = lsGet('ws_history') || [];
   collections = lsGet('ws_collections') || [];
   applyTheme();
@@ -1730,7 +1740,7 @@ function loadPersistedState() {
 }
 function saveLiked()    { lsSet('ws_liked',    [...liked.values()]); }
 function saveTopics()   { lsSet('ws_topics',   [...curTopics]); }
-function saveSettings() { lsSet('ws_settings', { swipe: swipeEnabled, rabbitHole: rabbitHoleEnabled, kbBar: kbBarEnabled, lightMode: lightMode, depth: depthLevel, haptic: hapticEnabled }); }
+function saveSettings() { lsSet('ws_settings', { swipe: swipeEnabled, rabbitHole: rabbitHoleEnabled, kbBar: kbBarEnabled, lightMode: lightMode, depth: depthLevel }); }
 function saveHistory()     { lsSet('ws_history', history.slice(0, 50)); }
 function saveCollections() { lsSet('ws_collections', collections); }
 
@@ -2723,8 +2733,7 @@ function syncAllToggles() {
   document.getElementById('themeToggle')?.classList.toggle('on', lightMode);
   document.getElementById('dkThemeToggle')?.classList.toggle('on', lightMode);
   // Haptic — mobile + desktop
-  document.getElementById('hapticToggle')?.classList.toggle('on', hapticEnabled);
-  document.getElementById('dkHapticToggle')?.classList.toggle('on', hapticEnabled);
+
   // Depth — mobile + desktop
   const ds1 = document.getElementById('depthSlider');
   const ds2 = document.getElementById('dkDepthSlider');
@@ -2756,18 +2765,6 @@ document.getElementById('themeToggle').addEventListener('click', () => setTheme(
 document.getElementById('dkThemeToggle').addEventListener('click', () => setTheme(!lightMode));
 
 // Haptic feedback
-function setHaptic(val) { hapticEnabled=val; saveSettings(); syncAllToggles(); toast(hapticEnabled ? '📳 Haptic feedback enabled' : 'Haptic feedback disabled'); }
-document.getElementById('hapticToggle').addEventListener('click', () => setHaptic(!hapticEnabled));
-document.getElementById('dkHapticToggle').addEventListener('click', () => setHaptic(!hapticEnabled));
-
-// Haptic feedback — Android only via Vibration API
-// iOS Safari does not support the Vibration API and Apple has not provided
-// a reliable web-based alternative. The checkbox switch workaround has been
-// patched/unreliable as of iOS 26.
-function triggerHaptic() {
-  if (!hapticEnabled) return;
-  if (navigator.vibrate) navigator.vibrate(12);
-}
 
 // Depth sliders — sync both sliders + step indicators on drag
 document.getElementById('depthSlider').addEventListener('input', ev => {
@@ -2837,9 +2834,13 @@ document.getElementById('likesBtn').addEventListener('click', () => {
 document.getElementById('lpClose').addEventListener('click', closeAllPanels);
 
 // Privacy policy modal
-// Opening is handled by inline onclick on the buttons — no addEventListener needed.
-// This function is called by onclick="...openPrivacy()" in the HTML.
+// Opening is handled by inline onclick on the buttons.
+// Safari synthesizes click events ~300ms after touchend. If the overlay opens
+// right as the synthetic click arrives, it lands on the backdrop and closes it.
+// The timestamp guard ignores backdrop clicks within 500ms of opening.
+let _privacyOpenTime = 0;
 function openPrivacy() {
+  _privacyOpenTime = Date.now();
   document.getElementById('privacyOverlay').classList.add('open');
 }
 function closePrivacy() {
@@ -2847,7 +2848,9 @@ function closePrivacy() {
 }
 document.getElementById('privacyClose').addEventListener('click', closePrivacy);
 document.getElementById('privacyOverlay').addEventListener('click', function(ev) {
-  if (ev.target === this) closePrivacy();
+  if (ev.target !== this) return;
+  if (Date.now() - _privacyOpenTime < 500) return;
+  closePrivacy();
 });
 document.addEventListener('keydown', ev => {
   if (ev.key!=='Escape') return;
@@ -3033,7 +3036,7 @@ document.getElementById('ambientClose').addEventListener('click', closeAmbient);
     clearTimeout(lpTimer);
     if (!activeCard||!swiping||flyLock) { activeCard=null; swiping=false; return; }
     const card=activeCard; activeCard=null; swiping=false;
-    if (swipeEnabled && Math.abs(curDx)>90) { triggerHaptic(); flyOff(card, curDx>0?1:-1); }
+    if (swipeEnabled && Math.abs(curDx)>90) { flyOff(card, curDx>0?1:-1); }
     else springBack(card);
   },{passive:true});
 
