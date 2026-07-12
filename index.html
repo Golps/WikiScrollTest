@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>WikiScroll — Discover Random Wikipedia Articles in a TikTok-Style Feed</title>
 <meta name="description" content="Swipe through random Wikipedia and Wikivoyage articles in a beautiful, infinite feed. Free, no ads, no tracking. 14 languages, offline support, topic filtering. Like TikTok for learning.">
 <meta name="keywords" content="Wikipedia reader, Wikivoyage, infinite scroll, random Wikipedia articles, learn something new, TikTok for learning, Wikipedia app, educational app, knowledge discovery, free learning, random knowledge, Wikipedia browser, travel articles">
@@ -21,9 +21,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/images/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/images/icon-512.png">
 
 <!-- Hreflang for multilingual signals -->
 <link rel="alternate" hreflang="en" href="https://wikiscroll.com/">
@@ -39,7 +39,7 @@
 <meta property="og:url" content="https://wikiscroll.com/">
 <meta property="og:title" content="WikiScroll — Random Wikipedia Articles, Beautifully Delivered">
 <meta property="og:description" content="Swipe through random Wikipedia and Wikivoyage articles in a beautiful, TikTok-style feed. Free, private, works offline. Learn something new every scroll.">
-<meta property="og:image" content="https://wikiscroll.com/og-image.png">
+<meta property="og:image" content="https://wikiscroll.com/images/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="WikiScroll — Discover Wikipedia like never before">
@@ -54,12 +54,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="WikiScroll — Random Wikipedia Articles, Beautifully Delivered">
 <meta name="twitter:description" content="Swipe through random Wikipedia and Wikivoyage articles in a beautiful feed. Free, no ads, no tracking. Like TikTok for learning.">
-<meta name="twitter:image" content="https://wikiscroll.com/og-image.png">
+<meta name="twitter:image" content="https://wikiscroll.com/images/og-image.png">
 <meta name="twitter:image:alt" content="WikiScroll — Discover Wikipedia like never before">
 <meta name="twitter:creator" content="@wikiscroll">
 
-<!-- iMessage / Rich Link -->
-<meta name="apple-itunes-app" content="app-argument=https://wikiscroll.com/">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -75,19 +73,18 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
   "author": { "@type": "Organization", "name": "WikiScroll", "url": "https://wikiscroll.com" },
-  "publisher": { "@type": "Organization", "name": "WikiScroll", "url": "https://wikiscroll.com", "logo": { "@type": "ImageObject", "url": "https://wikiscroll.com/icon-512.png" } },
+  "publisher": { "@type": "Organization", "name": "WikiScroll", "url": "https://wikiscroll.com", "logo": { "@type": "ImageObject", "url": "https://wikiscroll.com/images/icon-512.png" } },
   "browserRequirements": "Requires JavaScript. Works in Chrome, Firefox, Safari, Edge.",
-  "softwareVersion": "3.0",
+  "softwareVersion": "3.1",
   "datePublished": "2026-02-01",
-  "dateModified": "2026-02-25",
-  "screenshot": "https://wikiscroll.com/og-image.png",
-  "image": "https://wikiscroll.com/og-image.png",
-  "featureList": "Infinite scroll Wikipedia articles, Wikivoyage travel guides, 14 languages, 8 topic categories, swipe gestures, ambient reading mode, offline support, reading history, collections, share as image, interactive map explorer, reading streaks, article depth slider, keyboard shortcuts, Progressive Web App",
+  "dateModified": "2026-07-12",
+  "screenshot": "https://wikiscroll.com/images/og-image.png",
+  "image": "https://wikiscroll.com/images/og-image.png",
+  "featureList": "Infinite scroll Wikipedia articles, Wikivoyage travel guides, 14 languages, 8 topic categories, swipe gestures, ambient reading mode, offline support, reading history, collections, share with rich link previews, interactive map explorer, reading streaks, article depth slider, keyboard shortcuts, Progressive Web App",
   "keywords": "Wikipedia, Wikivoyage, infinite scroll, random articles, learning, discovery, knowledge, educational app, PWA, TikTok for learning",
   "inLanguage": ["en","es","fr","de","it","pt","ru","ja","zh","ar","hi","ko","nl","pl"],
   "isAccessibleForFree": true,
-  "permissions": "no special permissions required",
-  "isAccessibleForFree": true
+  "permissions": "no special permissions required"
 }
 </script>
 <script type="application/ld+json">
@@ -160,7 +157,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous"></script>
 <style>
 :root{
   --w1:#667eea;--w2:#764ba2;
@@ -240,7 +237,8 @@ body.how .badge{background:var(--h1);}
 .lang-dd.open{display:block;}
 .lopt{
   padding:9px 12px;cursor:pointer;border-radius:10px;
-  display:flex;align-items:center;gap:9px;
+  display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  background:none;border:none;font-family:'DM Sans',sans-serif;
   font-size:13px;color:rgba(255,255,255,.8);transition:background .15s;
 }
 .lopt:hover,.lopt.sel{background:rgba(255,255,255,.08);}
@@ -723,37 +721,6 @@ body.how .err-btn{background:linear-gradient(135deg,var(--h1),var(--h2));}
 .act.deeper:hover{background:rgba(251,191,36,.12);}
 .act.deeper.used{opacity:.4;pointer-events:none;}
 
-/* ── SHARE IMAGE OVERLAY ── */
-.share-img-overlay{
-  position:fixed;inset:0;z-index:800;display:none;
-  align-items:center;justify-content:center;
-  background:rgba(0,0,0,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-}
-.share-img-overlay.open{display:flex;}
-.share-img-card{
-  background:rgba(12,12,20,.98);border:1px solid var(--border);
-  border-radius:20px;padding:24px;width:min(380px,90vw);text-align:center;
-  animation:mshow .22s ease;
-}
-.share-img-preview{
-  width:100%;border-radius:14px;margin-bottom:16px;
-  box-shadow:0 8px 30px rgba(0,0,0,.5);
-}
-.share-img-actions{display:flex;gap:10px;justify-content:center;}
-.share-img-btn{
-  padding:10px 20px;border-radius:12px;border:1px solid var(--border);
-  background:rgba(255,255,255,.07);color:#fff;cursor:pointer;
-  font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;
-  transition:background .2s;
-}
-.share-img-btn:hover{background:rgba(255,255,255,.14);}
-.share-img-btn.primary{border:none;background:linear-gradient(135deg,var(--w1),var(--w2));font-weight:600;}
-body.how .share-img-btn.primary{background:linear-gradient(135deg,var(--h1),var(--h2));}
-.share-img-close{
-  position:absolute;top:12px;right:14px;background:none;border:none;
-  color:var(--dim);font-size:18px;cursor:pointer;
-}
-
 /* ── SETTINGS PANEL (desktop) ── */
 .sp-backdrop{
   position:fixed;inset:0;z-index:399;
@@ -884,8 +851,9 @@ body.light .sheet-overlay{background:rgba(0,0,0,.3);}
 body.light .topic-sheet{background:rgba(255,255,255,.98);border-color:rgba(0,0,0,.08);}
 body.light .sheet-title{color:#1a1a2e;}
 body.light .sheet-sub{color:rgba(0,0,0,.45);}
-body.light .topic-pill{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1);color:rgba(0,0,0,.7);}
-body.light .topic-pill.on{background:rgba(102,126,234,.12);border-color:rgba(102,126,234,.3);color:#4a5ad8;}
+body.light .topic-chip{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1);color:rgba(0,0,0,.7);}
+body.light .topic-chip:hover{background:rgba(0,0,0,.08);}
+body.light .topic-chip.on{background:rgba(102,126,234,.12);border-color:rgba(102,126,234,.3);color:#4a5ad8;}
 body.light .sp-backdrop,.light .burger-backdrop{background:rgba(0,0,0,.2);}
 body.light .streak-row{color:rgba(0,0,0,.55);}
 body.light .streak-num{color:#d97706;}
@@ -897,6 +865,30 @@ body.light #privacyOverlay .modal div{color:rgba(0,0,0,.6) !important;}
 body.light #privacyOverlay strong{color:rgba(0,0,0,.8) !important;}
 body.light .depth-val{color:#d97706;}
 body.light .privacy-link-btn{color:rgba(0,0,0,.25) !important;}
+/* Light theme — previously missing rules (white-on-white fixes) */
+body.light .blopt{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.7);}
+body.light .blopt:hover{background:rgba(0,0,0,.08);}
+body.light .blopt.sel{background:rgba(74,90,216,.1);border-color:rgba(74,90,216,.3);color:#4a5ad8;}
+body.light .btopic{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.65);}
+body.light .btopic:hover{background:rgba(0,0,0,.08);}
+body.light .btopic.on{background:rgba(74,90,216,.12);border-color:rgba(74,90,216,.3);color:#4a5ad8;}
+body.light .sheet-reset{border-color:rgba(0,0,0,.12);color:rgba(0,0,0,.45);}
+body.light .sheet-reset:hover{background:rgba(0,0,0,.05);color:#000;}
+body.light .sheet-handle{background:rgba(0,0,0,.15);}
+body.light .modal-close{color:rgba(0,0,0,.35);}
+body.light .modal-close:hover{color:#000;}
+body.light .empty{color:rgba(0,0,0,.4);}
+body.light .empty-ttl{color:rgba(0,0,0,.55);}
+body.light .lang-dd{background:rgba(255,255,255,.98);border-color:rgba(0,0,0,.1);box-shadow:0 20px 60px rgba(0,0,0,.15);scrollbar-color:rgba(0,0,0,.1) transparent;}
+body.light .lopt{color:rgba(0,0,0,.7);}
+body.light .lopt:hover,body.light .lopt.sel{background:rgba(0,0,0,.06);}
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
+  .spin{animation-duration:.85s !important;animation-iteration-count:infinite !important;}
+  .ptr-indicator.loading svg{animation-duration:.7s !important;animation-iteration-count:infinite !important;}
+}
 
 /* ── HISTORY PANEL ── */
 .hp{
@@ -1261,7 +1253,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
       <span class="badge topic-badge" id="topicBadge" style="display:none">0</span>
     </button>
     <button class="pill" id="settingsBtn"><span>⚙️</span><span>Settings</span></button>
-    <button class="burger-btn" id="burgerBtn" title="Menu">
+    <button class="burger-btn" id="burgerBtn" title="Menu" aria-label="Menu">
       <span class="burger-dot" id="burgerDot"></span>
       <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
         <line x1="2" y1="4.5" x2="16" y2="4.5"/>
@@ -1377,7 +1369,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
 
 <!-- LIKES PANEL -->
 <div class="lp" id="lp">
-  <div class="lp-hdr"><span>Saved Articles</span><button class="lp-x" id="lpClose">✕</button></div>
+  <div class="lp-hdr"><span>Saved Articles</span><button class="lp-x" id="lpClose" aria-label="Close saved articles">✕</button></div>
   <div class="coll-tabs" id="collTabs"></div>
   <div class="coll-new-row">
     <input class="coll-new-input" id="collNewInput" placeholder="New collection name…" maxlength="30">
@@ -1388,7 +1380,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
 
 <!-- HISTORY PANEL -->
 <div class="hp" id="hp">
-  <div class="hp-hdr"><span>History</span><button class="hp-x" id="hpClose">✕</button></div>
+  <div class="hp-hdr"><span>History</span><button class="hp-x" id="hpClose" aria-label="Close history">✕</button></div>
   <div id="historyList"></div>
 </div>
 
@@ -1401,7 +1393,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
   <h1>WikiScroll — Discover Random Wikipedia Articles in a TikTok-Style Feed</h1>
   <p>WikiScroll is a free Progressive Web App that lets you discover random Wikipedia and Wikivoyage articles in a beautiful, infinite, swipeable feed. Think of it as TikTok for learning — every swipe reveals a new article about science, history, geography, food, arts, technology, sports, or fascinating people from around the world.</p>
   <h2>Features</h2>
-  <p>Infinite scroll through curated Wikipedia articles with beautiful card design. Full Wikivoyage travel guide integration with interactive map explorer. Support for 14 languages including English, Spanish, French, German, Italian, Portuguese, Russian, Japanese, Chinese, Arabic, Hindi, Korean, Dutch, and Polish. Topic filtering across 8 categories. Swipe right to save articles, left to skip. Ambient reading mode for distraction-free learning. Reading history to find articles you've seen before. Offline support — works without internet. Dark and light themes. Article depth slider to control how obscure your feed gets. Collections to organize saved articles. Share beautiful image cards to social media. Reading streaks and milestone badges. Keyboard shortcuts for desktop power users. Install as a Progressive Web App on any device.</p>
+  <p>Infinite scroll through curated Wikipedia articles with beautiful card design. Full Wikivoyage travel guide integration with interactive map explorer. Support for 14 languages including English, Spanish, French, German, Italian, Portuguese, Russian, Japanese, Chinese, Arabic, Hindi, Korean, Dutch, and Polish. Topic filtering across 8 categories. Swipe right to save articles, left to skip. Ambient reading mode for distraction-free learning. Reading history to find articles you've seen before. Offline support — works without internet. Dark and light themes. Article depth slider to control how obscure your feed gets. Collections to organize saved articles. Share articles with rich link previews. Reading streaks and milestone badges. Keyboard shortcuts for desktop power users. Install as a Progressive Web App on any device.</p>
   <h2>How WikiScroll Works</h2>
   <p>WikiScroll fetches random articles from the Wikipedia and Wikivoyage REST APIs, filters them for quality, images, and relevance, then presents them in a full-screen card format. Each card shows the article title, an excerpt, a thumbnail image, auto-detected category tags, and estimated reading time. Swipe right or tap the heart to save articles for later. Tap "Read Full Article" to visit the original Wikipedia or Wikivoyage page. For Wikivoyage travel articles, an interactive map shows the location on a beautifully styled map powered by Leaflet and OpenStreetMap.</p>
   <h2>Privacy First</h2>
@@ -1441,7 +1433,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
 <!-- PRIVACY POLICY MODAL -->
 <div class="modal-overlay" id="privacyOverlay">
   <div class="modal" style="max-height:80vh;overflow-y:auto;text-align:left;max-width:min(520px,90vw);">
-    <button class="modal-close" id="privacyClose">✕</button>
+    <button class="modal-close" id="privacyClose" aria-label="Close privacy policy">✕</button>
     <div class="modal-logo" style="text-align:center;">Privacy Policy</div>
     <div style="font-size:13px;line-height:1.75;color:rgba(255,255,255,.65);">
       <p style="margin-bottom:12px;font-size:11px;color:var(--dim);">Last updated: February 2026</p>
@@ -1474,7 +1466,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
 <!-- SETTINGS PANEL (desktop) -->
 <div class="sp-backdrop" id="spBackdrop"></div>
 <div class="sp" id="settingsPanel">
-  <div class="sp-hdr"><span>Settings</span><button class="sp-x" id="spClose">✕</button></div>
+  <div class="sp-hdr"><span>Settings</span><button class="sp-x" id="spClose" aria-label="Close settings">✕</button></div>
 
   <div class="sp-section">
     <div class="sp-section-title">Gestures</div>
@@ -1483,7 +1475,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
         <span class="ico">👆</span>
         <div><div>Swipe Gestures</div><div class="sp-row-sub">Left to skip · Right to like</div></div>
       </div>
-      <button class="toggle-sw on" id="dkSwipeToggle" role="switch"></button>
+      <button class="toggle-sw on" id="dkSwipeToggle" role="switch" aria-label="Toggle swipe gestures"></button>
     </div>
   </div>
 
@@ -1494,7 +1486,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
         <span class="ico">🌙</span>
         <div><div>Light Mode</div><div class="sp-row-sub">For the 3 users who want it</div></div>
       </div>
-      <button class="toggle-sw" id="dkThemeToggle" role="switch"></button>
+      <button class="toggle-sw" id="dkThemeToggle" role="switch" aria-label="Toggle light mode"></button>
     </div>
   </div>
 
@@ -1505,7 +1497,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
         <span class="ico">🐇</span>
         <div><div>Rabbit Hole <span class="beta-tag">Beta</span></div><div class="sp-row-sub">Adds a "Go deeper" button to explore related articles</div></div>
       </div>
-      <button class="toggle-sw" id="dkRabbitToggle" role="switch"></button>
+      <button class="toggle-sw" id="dkRabbitToggle" role="switch" aria-label="Toggle rabbit hole mode"></button>
     </div>
     <div class="sp-row">
       <div class="sp-row-label">
@@ -1536,7 +1528,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
         <span class="ico">⌨️</span>
         <div><div>Show Keyboard Hints</div><div class="sp-row-sub">Navigation bar at the bottom of the screen</div></div>
       </div>
-      <button class="toggle-sw on" id="dkKbToggle" role="switch"></button>
+      <button class="toggle-sw on" id="dkKbToggle" role="switch" aria-label="Toggle keyboard hints"></button>
     </div>
   </div>
 
@@ -1575,7 +1567,7 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
   <div class="map-container">
     <div class="map-hdr">
       <div class="map-title" id="mapTitle">Exploring…</div>
-      <button class="map-close" id="mapClose">✕</button>
+      <button class="map-close" id="mapClose" aria-label="Close map">✕</button>
     </div>
     <div class="map-loading" id="mapLoading">
       <div class="map-loading-text">🗺️ Loading map…</div>
@@ -1595,10 +1587,10 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
   <div class="ambient-bg" id="ambientBg"></div>
   <div class="ambient-content">
     <div class="ambient-label">✦ Ambient Mode</div>
-    <div class="ambient-title" id="ambientTitle"></div>
-    <div class="ambient-excerpt" id="ambientExcerpt"></div>
+    <div class="ambient-title" id="ambientTitle" dir="auto"></div>
+    <div class="ambient-excerpt" id="ambientExcerpt" dir="auto"></div>
   </div>
-  <button class="ambient-close" id="ambientClose">✕</button>
+  <button class="ambient-close" id="ambientClose" aria-label="Close ambient mode">✕</button>
   <div class="ambient-hint">Tap anywhere to exit</div>
 </div>
 
@@ -1613,18 +1605,6 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
   <div class="kb-hint" id="kbMapHint" style="display:none"><span class="kb-key">M</span> Map</div>
   <div class="kb-hint"><span class="kb-key">Space</span> Ambient</div>
   <div class="kb-hint"><span class="kb-key">Esc</span> Close</div>
-</div>
-
-<!-- SHARE AS IMAGE OVERLAY -->
-<div class="share-img-overlay" id="shareImgOverlay">
-  <div class="share-img-card" style="position:relative">
-    <button class="share-img-close" id="shareImgClose">✕</button>
-    <img class="share-img-preview" id="shareImgPreview" alt="Share card preview">
-    <div class="share-img-actions">
-      <button class="share-img-btn" id="shareImgDownload">💾 Save Image</button>
-      <button class="share-img-btn primary" id="shareImgShare">📤 Share</button>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -1733,6 +1713,11 @@ function loadPersistedState() {
   kbBarEnabled = settings.kbBar !== false;
   lightMode = settings.lightMode === true;
   depthLevel = settings.depth || 3;
+  // Restore language: ?lang= URL param wins, then saved setting
+  const urlLang = new URLSearchParams(window.location.search).get('lang');
+  const wantLang = urlLang || settings.lang;
+  if (wantLang && LANGS.some(l => l.c === wantLang)) curLang = wantLang;
+  applyLangUI();
   history = lsGet('ws_history') || [];
   collections = lsGet('ws_collections') || [];
   applyTheme();
@@ -1740,7 +1725,7 @@ function loadPersistedState() {
 }
 function saveLiked()    { lsSet('ws_liked',    [...liked.values()]); }
 function saveTopics()   { lsSet('ws_topics',   [...curTopics]); }
-function saveSettings() { lsSet('ws_settings', { swipe: swipeEnabled, rabbitHole: rabbitHoleEnabled, kbBar: kbBarEnabled, lightMode: lightMode, depth: depthLevel }); }
+function saveSettings() { lsSet('ws_settings', { swipe: swipeEnabled, rabbitHole: rabbitHoleEnabled, kbBar: kbBarEnabled, lightMode: lightMode, depth: depthLevel, lang: curLang }); }
 function saveHistory()     { lsSet('ws_history', history.slice(0, 50)); }
 function saveCollections() { lsSet('ws_collections', collections); }
 
@@ -2182,7 +2167,9 @@ async function fillQueue() {
     const fn = curMode === 'wiki' ? (curTopics.size ? fetchWikiByTopic : fetchWiki) : fetchVoyage;
     const [a, b, c] = await Promise.all([fn(), fn(), fn()]);
     if (gen !== fillGeneration) return; // stale — mode/lang changed while awaiting
-    const fresh = [...a,...b,...c];
+    // Dedupe against everything already rendered or queued (random API can repeat)
+    const seen = new Set(articles.map(x => x.id).concat(queue.map(x => x.id)));
+    const fresh = [...a,...b,...c].filter(x => !seen.has(x.id) && (seen.add(x.id), true));
     queue.push(...fresh);
     fresh.forEach(art => preloadImg(art.img));
   } finally { filling = false; }
@@ -2294,7 +2281,7 @@ async function boot() {
 function resetFeed() {
   sentinel?.disconnect();
   fillGeneration++;
-  articles=[]; queue=[]; hinted=false; filling=false; relatedInQueue=0;
+  articles=[]; queue=[]; filling=false; relatedInQueue=0;
   document.getElementById('hint').style.display = 'none';
   const isHow = curMode==='how';
   document.getElementById('feed').innerHTML = `<div class="spin-wrap" id="spinner"><div class="spin${isHow?' h':''}"></div><div class="spin-lbl">${isHow?'Loading destinations…':'Loading articles…'}</div></div>`;
@@ -2356,8 +2343,8 @@ function renderCard(a) {
   const isHow   = a.src==='how', isLiked=liked.has(a.id);
   const pageid  = parseInt(a.id.slice(1));
   const isOTD   = a.src==='wiki' && otdIds.has(pageid);
-  const img     = a.img ? `<img src="${esc(a.img)}" alt="" onerror="this.remove()">` : '';
-  const artImg  = a.img ? `<img src="${esc(a.img)}" alt="" class="art-img" onerror="this.remove()">` : '';
+  const img     = a.img ? `<img src="${esc(a.img)}" alt="" decoding="async" onerror="this.remove()">` : '';
+  const artImg  = a.img ? `<img src="${esc(a.img)}" alt="" decoding="async" class="art-img" onerror="this.remove()">` : '';
   const cat     = detectCategory(a.body);
   const catHtml = cat ? `<span class="cat-tag">${cat.emoji} ${esc(cat.label)}</span>` : '';
   const rtHtml  = `<span class="read-time">⏱ ${readingTime(a.body)}</span>`;
@@ -2373,8 +2360,8 @@ function renderCard(a) {
       <div class="chip ${isHow?'h':'w'}">${isHow?'🗺️ Wikivoyage':'📖 Wikipedia'}</div>
       ${artImg}
       <div class="meta-row">${catHtml}${rtHtml}</div>
-      <h2 class="art-title"></h2>
-      <p class="art-body"></p>
+      <h2 class="art-title" dir="auto"></h2>
+      <p class="art-body" dir="auto"></p>
       <div class="acts">
         <button class="act${isLiked?' liked':''}" id="lb-${esc(a.id)}">${isLiked?'❤️ Liked':'🤍 Like'}</button>
         <button class="act">📤 Share</button>
@@ -2408,13 +2395,16 @@ function renderCard(a) {
     card.querySelector('.panel').appendChild(deeperRow);
   }
   document.getElementById('feed').appendChild(card);
-  trackHistory(a);
 }
 
 function showError() {
   const isHow = curMode==='how';
+  const offline = !navigator.onLine;
+  const msg = offline
+    ? "You're offline — reconnect and try again. Saved articles are still available in your Likes."
+    : `${isHow?'Wikivoyage':'Wikipedia'} didn't respond.`;
   const card = document.createElement('div'); card.className='card';
-  card.innerHTML = `<div class="cbg"><div class="cveil"></div></div><div class="err"><div class="err-ico">${isHow?'🗺️':'📖'}</div><div class="err-ttl">Nothing loaded</div><div class="err-msg">${isHow?'Wikivoyage':'Wikipedia'} didn't respond.</div><button class="err-btn">Try again</button></div>`;
+  card.innerHTML = `<div class="cbg"><div class="cveil"></div></div><div class="err"><div class="err-ico">${offline?'📡':(isHow?'🗺️':'📖')}</div><div class="err-ttl">Nothing loaded</div><div class="err-msg">${msg}</div><button class="err-btn">Try again</button></div>`;
   card.querySelector('.err-btn').addEventListener('click', resetFeed);
   document.getElementById('feed').appendChild(card);
 }
@@ -2539,7 +2529,9 @@ document.getElementById('collNewInput').addEventListener('keydown', ev => {
 // ── SHARE ──────────────────────────────────────────────────────────────────
 function deepLinkUrl(a) {
   // Build shareable WikiScroll deep link: wikiscroll.com/?a=w12345
-  const base = 'https://wikiscroll.com/';
+  // Uses the current origin when served over http(s) so staging/preview
+  // deployments generate working links; falls back to production domain.
+  const base = /^https?:$/.test(location.protocol) ? location.origin + '/' : 'https://wikiscroll.com/';
   return `${base}?a=${encodeURIComponent(a.id)}`;
 }
 function doShare(a) {
@@ -2552,42 +2544,6 @@ function doShare(a) {
     navigator.clipboard.writeText(shareUrl).then(() => toast('Link copied!')).catch(() => {});
   }
 }
-
-
-// Share image overlay events
-document.getElementById('shareImgClose').addEventListener('click', () => {
-  document.getElementById('shareImgOverlay').classList.remove('open');
-});
-document.getElementById('shareImgOverlay').addEventListener('click', ev => {
-  if (ev.target === ev.currentTarget) ev.currentTarget.classList.remove('open');
-});
-document.getElementById('shareImgDownload').addEventListener('click', () => {
-  const preview = document.getElementById('shareImgPreview');
-  const link = document.createElement('a');
-  link.download = `wikiscroll-${(preview._article?.title||'card').replace(/\s+/g,'-').slice(0,40)}.png`;
-  link.href = preview.src;
-  link.click();
-  toast('Image saved!');
-});
-document.getElementById('shareImgShare').addEventListener('click', async () => {
-  const preview = document.getElementById('shareImgPreview');
-  const a = preview._article;
-  const shareUrl = a ? deepLinkUrl(a) : 'https://wikiscroll.com';
-  if (navigator.share && navigator.canShare) {
-    try {
-      const blob = await new Promise(r => preview._canvas.toBlob(r, 'image/png'));
-      const file = new File([blob], 'wikiscroll.png', {type:'image/png'});
-      if (navigator.canShare({files:[file]})) {
-        await navigator.share({title: a?.title||'WikiScroll', text: `${a?.title} — WikiScroll`, url: shareUrl, files:[file]});
-      } else {
-        await navigator.share({title: a?.title||'WikiScroll', url: shareUrl});
-      }
-    } catch(e) { if (e.name!=='AbortError') toast('Share failed'); }
-  } else {
-    if (navigator.clipboard) navigator.clipboard.writeText(shareUrl).then(()=>toast('Link copied!')).catch(()=>{});
-  }
-  document.getElementById('shareImgOverlay').classList.remove('open');
-});
 
 // ── ON THIS DAY ────────────────────────────────────────────────────────────
 async function fetchOnThisDay() {
@@ -2637,22 +2593,33 @@ document.getElementById('sheetReset').addEventListener('click', () => {
 });
 function openTopicSheet()  { document.getElementById('topicSheet').classList.add('open');    document.getElementById('sheetOverlay').classList.add('open'); }
 function closeTopicSheet() { document.getElementById('topicSheet').classList.remove('open'); document.getElementById('sheetOverlay').classList.remove('open'); }
-document.getElementById('topicsBtn').addEventListener('click',    openTopicSheet);
+document.getElementById('topicsBtn').addEventListener('click', () => {
+  const sheet = document.getElementById('topicSheet');
+  if (sheet.classList.contains('open')) closeTopicSheet();
+  else openTopicSheet();
+});
 document.getElementById('sheetOverlay').addEventListener('click', closeTopicSheet);
 
 // ── LANGUAGE ───────────────────────────────────────────────────────────────
 const desktopLangDd = document.getElementById('langDd');
 const burgerLangGrid = document.getElementById('burgerLangGrid');
 
-desktopLangDd.innerHTML  = LANGS.map(l => `<div class="lopt${l.c===curLang?' sel':''}" data-c="${l.c}">${l.f} ${l.n}</div>`).join('');
+desktopLangDd.innerHTML  = LANGS.map(l => `<button class="lopt${l.c===curLang?' sel':''}" data-c="${l.c}">${l.f} ${l.n}</button>`).join('');
 burgerLangGrid.innerHTML = LANGS.map(l => `<button class="blopt${l.c===curLang?' sel':''}" data-c="${l.c}">${l.f} ${l.n}</button>`).join('');
 
-function setLang(c) {
-  curLang = c;
-  const lang = LANGS.find(l => l.c===c);
+// Updates language labels + selected states everywhere (hoisted — also called
+// during loadPersistedState before setLang exists in the flow)
+function applyLangUI() {
+  const lang = LANGS.find(l => l.c===curLang);
   if (lang) { document.getElementById('langTxt').textContent = lang.n; document.getElementById('burgerLangTxt').textContent = lang.n; }
   desktopLangDd.querySelectorAll('.lopt').forEach(o  => o.classList.toggle('sel',  o.dataset.c===curLang));
   burgerLangGrid.querySelectorAll('.blopt').forEach(o => o.classList.toggle('sel', o.dataset.c===curLang));
+}
+
+function setLang(c) {
+  curLang = c;
+  applyLangUI();
+  saveSettings();
   resetFeed();
 }
 
@@ -2721,19 +2688,22 @@ function syncDepthSteps() {
   });
 }
 function syncAllToggles() {
+  // role="switch" requires aria-checked to stay in sync with visual state
+  const setSw = (id, on) => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.toggle('on', on); el.setAttribute('aria-checked', on); }
+  };
   // Swipe — mobile + desktop
-  document.getElementById('swipeToggle')?.classList.toggle('on', swipeEnabled);
-  document.getElementById('dkSwipeToggle')?.classList.toggle('on', swipeEnabled);
+  setSw('swipeToggle', swipeEnabled);
+  setSw('dkSwipeToggle', swipeEnabled);
   // Rabbit Hole — mobile + desktop
-  document.getElementById('rabbitToggle')?.classList.toggle('on', rabbitHoleEnabled);
-  document.getElementById('dkRabbitToggle')?.classList.toggle('on', rabbitHoleEnabled);
+  setSw('rabbitToggle', rabbitHoleEnabled);
+  setSw('dkRabbitToggle', rabbitHoleEnabled);
   // KB bar — desktop only
-  document.getElementById('dkKbToggle')?.classList.toggle('on', kbBarEnabled);
+  setSw('dkKbToggle', kbBarEnabled);
   // Theme — mobile + desktop
-  document.getElementById('themeToggle')?.classList.toggle('on', lightMode);
-  document.getElementById('dkThemeToggle')?.classList.toggle('on', lightMode);
-  // Haptic — mobile + desktop
-
+  setSw('themeToggle', lightMode);
+  setSw('dkThemeToggle', lightMode);
   // Depth — mobile + desktop
   const ds1 = document.getElementById('depthSlider');
   const ds2 = document.getElementById('dkDepthSlider');
@@ -2855,8 +2825,8 @@ document.getElementById('privacyOverlay').addEventListener('click', function(ev)
 document.addEventListener('keydown', ev => {
   if (ev.key!=='Escape') return;
   closePrivacy();
-  document.getElementById('shareImgOverlay').classList.remove('open');
   document.getElementById('mapOverlay').classList.remove('open');
+  document.getElementById('langDd').classList.remove('open');
   closeAllPanels(); closeBurger(); closeTopicSheet(); closeAmbient();
   document.getElementById('feed').focus();
 });
@@ -3254,15 +3224,22 @@ function updateKbHints() {
 }
 
 // ── SCROLL-BASED VIEW TRACKING ──────────────────────────────────────────
-let _lastViewedIdx = -1;
+// Each card counts once (Set-based) — no double-counting on boot, no
+// re-counting when scrolling back up. History records only what you saw.
+const _viewedIds = new Set();
+function markViewed(card) {
+  const id = card?.dataset?.id;
+  if (!id || _viewedIds.has(id)) return;
+  _viewedIds.add(id);
+  bumpStat();
+  const a = articles.find(x => x.id === id);
+  if (a) trackHistory(a);
+}
 function trackScrollView() {
   const feed = document.getElementById('feed');
   const idx = Math.round(feed.scrollTop / window.innerHeight);
-  if (idx !== _lastViewedIdx && idx >= 0) {
-    _lastViewedIdx = idx;
-    const card = feed.querySelectorAll('.card')[idx];
-    if (card && card.dataset.id) bumpStat();
-  }
+  const card = feed.querySelectorAll('.card')[idx];
+  if (card) markViewed(card);
 }
 
 document.getElementById('feed').addEventListener('scroll', () => {
@@ -3277,7 +3254,10 @@ boot();
 // Auto-focus feed so arrow keys work immediately on desktop
 requestAnimationFrame(() => document.getElementById('feed').focus());
 // Count the first card as viewed once it's rendered
-setTimeout(() => { _lastViewedIdx = 0; bumpStat(); }, 1500);
+setTimeout(() => {
+  const first = document.querySelector('#feed .card');
+  if (first) markViewed(first);
+}, 1500);
 </script>
 </body>
 </html>
