@@ -170,7 +170,7 @@
   --vh:100vh;
 }
 @supports (height:100dvh) { :root{--vh:100dvh;} }
-*{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;overscroll-behavior:none;-webkit-overflow-scrolling:touch;}
 body{font-family:'DM Sans',sans-serif;background:#0a0a11;color:var(--txt);}
 ::selection{background:rgba(102,126,234,.35);}
@@ -270,11 +270,6 @@ body.how .badge{background:var(--h1);}
 }
 .burger-btn:hover{background:rgba(255,255,255,.13);}
 .burger-btn svg{width:18px;height:18px;display:block;}
-.burger-dot{
-  position:absolute;top:-3px;right:-3px;width:8px;height:8px;
-  border-radius:50%;background:var(--w1);display:none;
-}
-body.how .burger-dot{background:var(--h1);}
 
 /* ── BURGER MENU ── */
 .burger-backdrop{
@@ -1309,7 +1304,6 @@ body.light .offline-banner{background:rgba(239,68,68,.08);color:#dc2626;}
     </button>
     <button class="pill" id="settingsBtn"><span>⚙️</span><span>Settings</span></button>
     <button class="burger-btn" id="burgerBtn" title="Menu" aria-label="Menu">
-      <span class="burger-dot" id="burgerDot"></span>
       <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
         <line x1="2" y1="4.5" x2="16" y2="4.5"/>
         <line x1="2" y1="9" x2="16" y2="9"/>
@@ -1988,9 +1982,9 @@ function deleteCollection(colIdx) {
 //     1 Popular = chart ranks 1-250 (what the world is reading right now)
 //     2 Known   = chart ranks 250-1000 (famous, but not the headlines)
 //   Levels 3-5 sample random articles filtered by average daily views:
-//     3 Balanced ≥20/day · 4 Niche ≥2/day · 5 Obscure = the raw long tail
+//     3 Balanced ≥10/day · 4 Niche ≥2/day · 5 Obscure = the raw long tail
 const MIN_EXTRACT = 80; // readability floor only — no longer the depth proxy
-const DEPTH_VIEWS = {1:300, 2:100, 3:20, 4:2, 5:0}; // avg daily views floors
+const DEPTH_VIEWS = {1:300, 2:100, 3:10, 4:2, 5:0}; // avg daily views floors
 const DEPTH_LABELS = {1:'Popular', 2:'Known', 3:'Balanced', 4:'Niche', 5:'Obscure'};
 
 function avgDailyViews(p) {
@@ -2080,9 +2074,18 @@ async function fetchWikiRandom() {
   const data = await fetchOne(url);
   if (!data?.query?.pages) return [];
   const floor = DEPTH_VIEWS[depthLevel] ?? 0;
-  return Object.values(data.query.pages)
-    .filter(p => p?.thumbnail?.source && isValidTitle(p.title) && stripHtml(p.extract||'').length >= MIN_EXTRACT && avgDailyViews(p) >= floor)
-    .sort(() => Math.random() - .5).slice(0, 5)
+  const renderable = Object.values(data.query.pages)
+    .filter(p => p?.thumbnail?.source && isValidTitle(p.title) && stripHtml(p.extract||'').length >= MIN_EXTRACT);
+  let picked = renderable.filter(p => avgDailyViews(p) >= floor);
+  // Supply beats purity: if the floor starves the batch, top up with the
+  // closest-to-floor leftovers (highest views first). Depth stays biased
+  // toward the chosen level, but the feed can never run dry because of it.
+  if (picked.length < 5 && floor > 0) {
+    const rest = renderable.filter(p => avgDailyViews(p) < floor)
+      .sort((x, y) => avgDailyViews(y) - avgDailyViews(x));
+    picked = picked.concat(rest.slice(0, 5 - picked.length));
+  }
+  return picked.sort(() => Math.random() - .5).slice(0, 5)
     .map(p => wikiPageToArticle(p, curLang));
 }
 
@@ -2099,7 +2102,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js', {scope:'/'}).catch(() => {
     // Fallback: inline service worker via blob URL
     const swCode = `
-      const CACHE = 'wikiscroll-v4';
+      const CACHE = 'wikiscroll-v6';
       const SHELL = ['/'];
       self.addEventListener('install', e => {
         e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));
@@ -2114,16 +2117,40 @@ if ('serviceWorker' in navigator) {
       self.addEventListener('fetch', e => {
         if (e.request.method !== 'GET') return;
         const url = new URL(e.request.url);
-        if (url.origin === location.origin || url.hostname.includes('wikipedia.org') || url.hostname.includes('wikivoyage.org')) {
-          e.respondWith(
-            caches.open(CACHE).then(cache =>
-              fetch(e.request).then(resp => {
-                if (resp.ok) cache.put(e.request, resp.clone());
-                return resp;
-              }).catch(() => cache.match(e.request))
-            )
-          );
+        // Never cache live API queries: generator=random reuses one URL, so a
+        // cached copy replays the same batch which then dedupes to nothing
+        if (url.pathname.includes('/api.php') || url.pathname.includes('/api/rest_v1/') || url.hostname === 'wikimedia.org') return;
+        const cacheable = url.origin === location.origin || url.hostname.includes('wikipedia.org') || url.hostname.includes('wikivoyage.org');
+        if (!cacheable) return;
+        if (e.request.mode === 'navigate') {
+          // App-launch feel: network gets 2.5s to answer, then we paint the
+          // cached shell instantly. Fast networks stay always-fresh; slow or
+          // flaky ones launch like an installed app. The network fetch keeps
+          // going in the background and refreshes the cache for next launch.
+          e.respondWith((async () => {
+            const cache = await caches.open(CACHE);
+            const network = fetch(e.request).then(resp => {
+              if (resp.ok) cache.put(e.request, resp.clone());
+              return resp;
+            });
+            const winner = await Promise.race([
+              network.catch(() => 'fail'),
+              new Promise(res => setTimeout(() => res('slow'), 2500)),
+            ]);
+            if (winner !== 'slow' && winner !== 'fail') return winner;
+            const cached = (await cache.match(e.request)) || (await cache.match('/'));
+            return cached || network;
+          })());
+          return;
         }
+        e.respondWith(
+          caches.open(CACHE).then(cache =>
+            fetch(e.request).then(resp => {
+              if (resp.ok) cache.put(e.request, resp.clone());
+              return resp;
+            }).catch(() => cache.match(e.request))
+          )
+        );
       });
     `;
     try {
@@ -2170,7 +2197,8 @@ async function fetchWikiByTopic() {
     const url = ['https://en.wikipedia.org/w/api.php','?action=query','&generator=categorymembers',`&gcmtitle=${encodeURIComponent(cat)}`,'&gcmlimit=30','&gcmtype=page','&gcmnamespace=0','&prop=pageviews%7Cpageimages%7Cextracts','&pvipdays=14','&exintro=1','&exchars=800','&piprop=thumbnail','&pithumbsize=640','&pilimit=30','&format=json','&origin=*'].join('');
     const data = await fetchOne(url);
     if (!data?.query?.pages) continue;
-    const pages = Object.values(data.query.pages);
+    const seenT = new Set(articles.map(x => x.id).concat(queue.map(x => x.id)));
+    const pages = Object.values(data.query.pages).filter(p => !seenT.has('w'+p.pageid));
     // Apply the pageview floor; if the category can't satisfy it, relax the
     // floor rather than starve the topic feed
     let valid = pages.filter(p => isValidWikiPage(p,td) && avgDailyViews(p) >= floor);
@@ -2192,8 +2220,10 @@ async function fetchVoyage() {
         const url = ['https://en.wikivoyage.org/w/api.php','?action=query','&generator=categorymembers',`&gcmtitle=${encodeURIComponent(cat)}`,'&gcmlimit=25','&gcmtype=page','&gcmnamespace=0','&prop=pageimages%7Cextracts','&exintro=1','&exchars=600','&piprop=thumbnail','&pithumbsize=640','&pilimit=25','&format=json','&origin=*'].join('');
         const data = await fetchOne(url);
         if (data?.query?.pages) {
+          const seenV = new Set(articles.map(x => x.id).concat(queue.map(x => x.id)));
           const valid = Object.values(data.query.pages).filter(p => {
             if (!p?.thumbnail?.source || !isValidTitle(p.title)) return false;
+            if (seenV.has('v'+p.pageid)) return false; // finite lists — don't re-serve
             const s = stripHtml(p.extract||'').slice(0,500);
             return s.length >= 40 && GEO_RE.test(s) && !NONPLACE_RE.test(s);
           }).sort(() => Math.random()-.5).slice(0,5).map(p => ({
@@ -2316,41 +2346,77 @@ async function fillQueue() {
   const gen = fillGeneration;
   try {
     const fn = curMode === 'wiki' ? (curTopics.size ? fetchWikiByTopic : fetchWiki) : fetchVoyage;
-    const [a, b, c] = await Promise.all([fn(), fn(), fn()]);
-    if (gen !== fillGeneration) return; // stale — mode/lang changed while awaiting
     // Dedupe against everything already rendered or queued (random API can repeat)
     const seen = new Set(articles.map(x => x.id).concat(queue.map(x => x.id)));
-    const fresh = [...a,...b,...c].filter(x => !seen.has(x.id) && (seen.add(x.id), true));
+    const dedupe = arr => arr.filter(x => x && !seen.has(x.id) && (seen.add(x.id), true));
+    const [a, b, c] = await Promise.all([fn(), fn(), fn()]);
+    if (gen !== fillGeneration) return; // stale — mode/lang changed while awaiting
+    let fresh = dedupe([...a,...b,...c]);
+    // Thin yield (harsh filters / exhausted categories)? One more round now,
+    // so a single fill almost always produces a usable batch.
+    if (fresh.length < 3) {
+      const [d2, e2] = await Promise.all([fn(), fn()]);
+      if (gen !== fillGeneration) return;
+      fresh = fresh.concat(dedupe([...d2, ...e2]));
+    }
     queue.push(...fresh);
     fresh.forEach(art => preloadImg(art.img));
   } finally { filling = false; }
 }
 
+// ── SUPPLY WATCHDOG ──
+// If the feed ever runs dry (slow network, filter drought, exhausted
+// categories), keep retrying with bounded backoff until cards flow again.
+// This is the guarantee that the next card ALWAYS eventually loads.
+let refillTimer = null, refillAttempts = 0;
+function scheduleRefill() {
+  if (refillTimer) return;
+  const delay = Math.min(8000, 700 * Math.pow(1.6, refillAttempts++));
+  refillTimer = setTimeout(async () => {
+    refillTimer = null;
+    if (queue.length) { refillAttempts = 0; flushQueue(5); return; }
+    await fillQueue();
+    if (queue.length) { refillAttempts = 0; flushQueue(5); }
+    else if (refillAttempts < 12) scheduleRefill();
+  }, delay);
+}
+window.addEventListener('online', () => {
+  refillAttempts = 0;
+  if (!queue.length) scheduleRefill();
+});
+
 function flushQueue(n) {
   const batch = queue.splice(0, n||5);
-  if (!batch.length) return;
-  batch.forEach(a => { if (a._related) relatedInQueue = Math.max(0, relatedInQueue-1); });
-  articles.push(...batch);
-  batch.forEach(renderCard);
-  if (!hinted && articles.length >= 2) {
-    hinted = true;
-    const h = document.getElementById('hint');
-    h.style.display = 'flex';
-    setTimeout(() => { h.style.display='none'; }, 5500);
+  if (batch.length) {
+    batch.forEach(a => { if (a._related) relatedInQueue = Math.max(0, relatedInQueue-1); });
+    articles.push(...batch);
+    batch.forEach(renderCard);
+    if (!hinted && articles.length >= 2) {
+      hinted = true;
+      const h = document.getElementById('hint');
+      h.style.display = 'flex';
+      setTimeout(() => { h.style.display='none'; }, 5500);
+    }
   }
+  // Always re-arm the sentinel and keep the pipeline pumping — an empty
+  // queue must trigger recovery, never a silent dead feed
   attachSentinel();
   preloadQueueImages();
   if (queue.length < QUEUE_MIN) fillQueue();
+  if (!batch.length) scheduleRefill();
 }
 
 function attachSentinel() {
   sentinel?.disconnect();
   const cards = document.getElementById('feed').querySelectorAll('.card');
-  if (cards.length < 4) return;
+  if (!cards.length) return;
+  // Observe 4th-from-last when possible, otherwise the last card — a thin
+  // feed (slow boot, harsh filters) must still be able to grow
+  const target = cards[Math.max(0, cards.length - 4)];
   sentinel = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) { sentinel.disconnect(); flushQueue(5); }
   }, {rootMargin:'0px 0px 400% 0px'});
-  sentinel.observe(cards[cards.length-4]);
+  sentinel.observe(target);
 }
 
 // ── DOM PRUNING ───────────────────────────────────────────────────────────
@@ -2420,7 +2486,8 @@ async function boot() {
       articles.push(deepArt);
       renderCard(deepArt);
     }
-    if (!queue.length && !deepArt) { showError(); return; }
+    if (!queue.length) await fillQueue(); // one automatic retry before giving up
+    if (!queue.length && !deepArt) { showError(); scheduleRefill(); return; }
     flushQueue(5);
   } catch(e) {
     console.error(e);
@@ -2433,6 +2500,7 @@ function resetFeed() {
   sentinel?.disconnect();
   fillGeneration++;
   articles=[]; queue=[]; filling=false; relatedInQueue=0;
+  clearTimeout(refillTimer); refillTimer=null; refillAttempts=0;
   document.getElementById('hint').style.display = 'none';
   const isHow = curMode==='how';
   document.getElementById('feed').innerHTML = `<div class="spin-wrap" id="spinner"><div class="spin${isHow?' h':''}"></div><div class="spin-lbl">${isHow?'Loading destinations…':'Loading articles…'}</div></div>`;
@@ -2594,8 +2662,6 @@ function updateBadge() {
     const el = document.getElementById(id);
     if (el) { el.textContent=n; el.style.display=n?'inline-block':'none'; }
   });
-  const dot = document.getElementById('burgerDot');
-  if (dot) dot.style.display = (n||curTopics.size) ? 'block' : 'none';
 }
 function updateTopicBadge() {
   const n = curTopics.size;
@@ -2605,8 +2671,6 @@ function updateTopicBadge() {
   if (bb) bb.className='burger-action'+(n?' active':'');
   const dtb = document.getElementById('topicsBtn');
   if (dtb) dtb.style.background = n?'rgba(102,126,234,.18)':'';
-  const dot = document.getElementById('burgerDot');
-  if (dot) dot.style.display = (liked.size||n) ? 'block' : 'none';
 }
 
 function renderLikedList() {
@@ -2870,7 +2934,14 @@ function setRabbit(val) {
   resetFeed(); // both directions, so Go-deeper buttons match the setting
 }
 function setKbBar(val) { kbBarEnabled=val; saveSettings(); syncAllToggles(); }
-function setTheme(val) { lightMode=val; saveSettings(); applyTheme(); syncAllToggles(); }
+function setTheme(val) {
+  lightMode=val; saveSettings();
+  // View Transitions API: the whole UI cross-fades between themes like a
+  // native mode switch (progressive enhancement — instant where unsupported)
+  if (document.startViewTransition) document.startViewTransition(() => applyTheme());
+  else applyTheme();
+  syncAllToggles();
+}
 function setDepth(val) { depthLevel=parseInt(val)||3; saveSettings(); syncAllToggles(); toast(`🔭 Depth: ${DEPTH_LABELS[depthLevel]}`); resetFeed(); }
 
 // Mobile toggles
